@@ -55,10 +55,12 @@ def runcommand(cmd):
             print(f"Error: The command failed with exit code {e.returncode}")
     end=time.time()
     print(end-start)
+    with open(os.path.join(out,f"time-{end-start}.log"), "w") as outfile:
+        outfile.write(f'{end-start}')
     return end-start
 print('Num tasks=',len(commands))
 
-n_jobs=2
+n_jobs=10
 print('Estimated time',10*len(commands)/n_jobs/60, ' hours')
 
 
