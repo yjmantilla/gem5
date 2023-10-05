@@ -137,6 +137,10 @@ power_logs=[x.replace('stats.txt','power.log') for x in files]
 power_logs=[extract_values_from_log(x) for x in power_logs]
 print(power_logs)
 
+
+# TODO
+# add check that at least one output file is in the directory
+# that way we at least have an indication of the procedure running correctly
 #print(files)
 
 data=[dict_file(x) for x in files]
