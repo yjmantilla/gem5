@@ -1,3 +1,5 @@
+/tests/*
+/util/*
 cpu_tests
 build
 parser.out
