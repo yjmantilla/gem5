@@ -23,6 +23,9 @@ params={
     'l1d_size':['128kB','256kB'],
 }
 
+# ojo con variables que no tienen sentido
+# cache l1 no deberia ser mas grande que cache l2
+
 combinations = list(product(workload_iters,*params.values()))
 params.keys()
 

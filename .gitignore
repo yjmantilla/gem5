@@ -1,5 +1,6 @@
-/tests/*
-/util/*
+tests
+util
+src
 cpu_tests
 build
 parser.out

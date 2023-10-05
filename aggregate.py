@@ -1,6 +1,7 @@
 import os
 import glob
 import pandas as pd
+import numpy as np
 def parse_line(line):
     """
     Parse a single line based on the provided instructions.
@@ -70,10 +71,10 @@ def dict_file(fi):
     for x in meta.split('.'):
         y = x.split('@')
         metad[y[0]]=y[1]
-    print(metad)
+    #print(metad)
     dat=parse_stats_file_updated(fi)
     df_updated=dat.copy()
-    print(dat)
+    #print(dat)
 
     # Check if the names are unique
     are_names_unique = df_updated["Name"].nunique() == df_updated.shape[0]
@@ -94,26 +95,66 @@ def dict_file(fi):
             flattened_dict[key] = [try_convert_to_float(item) for item in value]
         else:
             flattened_dict[key] = try_convert_to_float(value)
-    print(flattened_dict)
+    #print(flattened_dict)
 
     metad.update(flattened_dict)
     return metad
+
+
+def extract_values_from_log(filename):
+    if not os.path.isfile(filename):
+        return {"Total Leakage":np.nan, "Runtime Dynamic":np.nan}
+    with open(filename, 'r') as f:
+        lines = f.readlines()
+        
+    # Flags to indicate the start and end of the processor section
+    start_processor = False
     
+    # Variables to store extracted values
+    total_leakage = None
+    runtime_dynamic = None
+    
+    for line in lines:
+        stripped_line = line.strip()
+        
+        if "Processor:" in stripped_line:
+            start_processor = True
+        if "Total Cores:" in stripped_line:
+            break
+        
+        if start_processor:
+            if "Total Leakage" in stripped_line:
+                total_leakage = stripped_line.split('=')[1].strip()
+            elif "Runtime Dynamic" in stripped_line:
+                runtime_dynamic = stripped_line.split('=')[1].strip()
+    cleanit=lambda x:float(x.replace('W',''))
+    return {"Total Leakage":cleanit(total_leakage), "Runtime Dynamic":cleanit(runtime_dynamic)}
+
 DATAPATTERN='output/**/stats.txt'
 DATAPATH='output'
 files=glob.glob(DATAPATTERN,recursive=True)
+power_logs=[x.replace('stats.txt','power.log') for x in files]
+power_logs=[extract_values_from_log(x) for x in power_logs]
+print(power_logs)
 
-print(files)
+#print(files)
 
 data=[dict_file(x) for x in files]
-
+for ff,pw in zip(data,power_logs):
+    try:
+        ff.update(pw)
+    except:
+        print('Power Error')
 df=pd.DataFrame(data)
-print(df)
+
+
+df['Energy']=df["Total Leakage"]+df["Runtime Dynamic"]
+df['EDP']=df['Energy']*(df['system.cpu.cpi']**2)
+
 
 df.to_csv(os.path.join(DATAPATH,'aggregation.csv'))
-
-
-
+[print(x) for x in df.columns]
+print(df['EDP'])
 # Parse the provided file using the updated function
 #df_updated = parse_stats_file_updated("/mnt/data/stats.txt")
 #df_updated.head()
