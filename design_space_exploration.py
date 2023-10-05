@@ -123,7 +123,7 @@ if __name__=='__main__':
     print('Num tasks=',len(commands))
 
     n_jobs=10
-    print('Estimated time',10*len(commands)/n_jobs/60, ' hours')
+    print('Estimated time',15*len(commands)/n_jobs/60, ' hours')
 
 
     if RUN:
