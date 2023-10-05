@@ -37,23 +37,23 @@ params={'l1i_size':["32kB","64kB","128kB"] #"L1 instruction cache size default:"
 #,'rename_width':[4] #"CPU rename width default:"4"
 #,'commit_width':[4] #"CPU commith width default:"4"
 #,'dispatch_width':[8] #"CPU dispatch width default:"8"
-,'issue_width':[2,8] #"CPU issue width default:"8"
+,'issue_width':[4,8] #"CPU issue width default:"8"
 #,'wb_width':[4] #"CPU write back width default:"4"
 #,'fb_entries':[16] #"Number of fetch buffer entries default:"16"
 #,'fq_entries':[16] #"Number of fetch queue entries default:"16"
 #,'iq_entries':[16] #"Number of instruction queue entries default:"16"
-,'rob_entries':[128,256,512] #"Number of reorder buffer entries default:"128"
+,'rob_entries':[128,512] #"Number of reorder buffer entries default:"128"
 #,'lq_entries':[68] #"Number of load queue entries default:"68"
 #,'sq_entries':[72] #"Number of store queue entries default:"72"
 #,'btb_entries':[8192] #"Number of BTB entries default:"8192"
 #,'ras_entries':[16] #"Number of RAS entries default:"16"
 #,'num_fu_cmp':[1] #"Number of execution units for compare/branch instructions default:"1"
-,'num_fu_intALU':[2,4,8] #"Number of execution units for integer ALU instructions default:"2"
+,'num_fu_intALU':[2,4] #"Number of execution units for integer ALU instructions default:"2"
 #,'num_fu_intDIVMUL':[1] #"Number of execution units for integer Division and Multiplication instructions default:"1"
 #,'num_fu_FP_SIMD_ALU':[2] #"Number of execution units for Floating-Point and SIMD instructions default:"2"
 #,'num_fu_read':[2] #"Number of execution units for load instructions default:"2"
 #,'num_fu_write':[1] #"Number of execution units for store instructions default:"1"
-,'branch_predictor_type':[0,3,7,10] #"Branch predictor type: 0 - BiModeBP, 1 - LTAGE, 2 - LocalBP, 3 - MultiperspectivePerceptron64KB, 4 - MultiperspectivePerceptron8KB, 5 - MultiperspectivePerceptronTAGE64KB, 6 - MultiperspectivePerceptronTAGE8KB, 7 - TAGE, 8 - TAGE_SC_L_64KB, 9 - TAGE_SC_L_8KB, 10 - TournamentBP default:"10"
+,'branch_predictor_type':[0,3,7] #"Branch predictor type: 0 - BiModeBP, 1 - LTAGE, 2 - LocalBP, 3 - MultiperspectivePerceptron64KB, 4 - MultiperspectivePerceptron8KB, 5 - MultiperspectivePerceptronTAGE64KB, 6 - MultiperspectivePerceptronTAGE8KB, 7 - TAGE, 8 - TAGE_SC_L_64KB, 9 - TAGE_SC_L_8KB, 10 - TournamentBP default:"10"
 }
 
 def abbv(x):
@@ -88,7 +88,7 @@ def runcommand(cmd):
     return end-start
 
 if __name__=='__main__':
-    RUN=True
+    RUN=False
     combinations = list(product(*params.values(),workload_iters))
     params.keys()
 
