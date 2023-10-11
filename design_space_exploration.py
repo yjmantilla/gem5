@@ -37,7 +37,7 @@ params={'l1i_size':["32kB","64kB","128kB"] #"L1 instruction cache size default:"
 #,'rename_width':[4] #"CPU rename width default:"4"
 #,'commit_width':[4] #"CPU commith width default:"4"
 #,'dispatch_width':[8] #"CPU dispatch width default:"8"
-,'issue_width':[4,8,16] #"CPU issue width default:"8"
+,'issue_width':[4,8,12] #"CPU issue width default:"8"
 #,'wb_width':[4] #"CPU write back width default:"4"
 #,'fb_entries':[16] #"Number of fetch buffer entries default:"16"
 #,'fq_entries':[16] #"Number of fetch queue entries default:"16"
@@ -85,10 +85,10 @@ def runcommand(cmd):
         except subprocess.CalledProcessError as e:
             print(f"Error: The command failed with exit code {e.returncode}")
 
-    return end-start
+    return None
 
 if __name__=='__main__':
-    RUN=False
+    RUN=True
     combinations = list(product(*params.values(),workload_iters))
     params.keys()
 

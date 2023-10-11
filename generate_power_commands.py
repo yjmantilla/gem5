@@ -17,10 +17,11 @@ def get_command(ff):
 	cfg=stats.replace('stats.txt','config.json')
 	xml=stats.replace('stats.txt','config.xml')
 	power=stats.replace('stats.txt','power.log')
+	powertime = stats.replace('stats.txt','power.time')
 
 	# to be run from arch dir (the root of gem5 and mcpat)
 	command1=f'python gem5/gem5toMcPAT_cortexA76.py gem5/{stats} gem5/{cfg} gem5/ARM_A76_2.1GHz.xml gem5/{xml}'
-	command2=f'./mcpat/mcpat -infile gem5/{xml} > gem5/{power}'
+	command2=f'( time ( ./mcpat/mcpat -infile gem5/{xml} > gem5/{power}; ); ) 2> gem5/{powertime}'
 
 	return [command1,command2]
 
@@ -31,7 +32,7 @@ for ff in files:
 		commands += get_command(ff)
 	else:
 		a,b=get_command(ff)
-		commands+=['(',a,b+' ) &']
+		commands+=[' ; '.join([a,b])] #'"'+' ; '.join([a,b])+'"'] #[' '.join(['(',a,b+' )'])]#, '&']
 commands+=['pwd']
 print(commands)
 #commands=['conda activate py27']+commands

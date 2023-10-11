@@ -102,6 +102,7 @@ def dict_file(fi):
 
 
 def extract_values_from_log(filename):
+    print(filename)
     if not os.path.isfile(filename):
         return {"Total Leakage":np.nan, "Runtime Dynamic":np.nan}
     with open(filename, 'r') as f:
@@ -135,7 +136,7 @@ DATAPATH='output'
 files=glob.glob(DATAPATTERN,recursive=True)
 power_logs=[x.replace('stats.txt','power.log') for x in files]
 power_logs=[extract_values_from_log(x) for x in power_logs]
-print(power_logs)
+#print(power_logs)
 
 
 # TODO
@@ -157,8 +158,8 @@ df['EDP']=df['Energy']*(df['system.cpu.cpi']**2)
 
 
 df.to_csv(os.path.join(DATAPATH,'aggregation.csv'))
-[print(x) for x in df.columns]
-print(df['EDP'])
+#[print(x) for x in df.columns]
+#print(df['EDP'])
 # Parse the provided file using the updated function
 #df_updated = parse_stats_file_updated("/mnt/data/stats.txt")
 #df_updated.head()

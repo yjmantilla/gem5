@@ -4,3 +4,11 @@
 conda deactivate
 conda deactivate
 python3 design_space_exploration.py > archsim.log
+
+# Generate MCPAT commands
+
+conda deactivate
+python3 generate_power_commands.py
+cd ..
+conda activate py27
+cat gem5/powerCommands.sh | parallel -j7
