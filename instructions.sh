@@ -12,3 +12,9 @@ python3 generate_power_commands.py
 cd ..
 conda activate py27
 cat gem5/powerCommands.sh | parallel -j7
+
+# Intrusction Class Profiling
+conda deactivate
+conda deactivate
+cd gem5
+. profile.sh
