@@ -174,7 +174,7 @@ if not os.path.isfile(os.path.join(OUTPUTPATH,'icp.csv')) or not os.path.isfile(
     power_times=[extract_data_from_timefile(x) for x in power_times]
     data=[dict_file(x) for x in files]
 
-    DATAPATTERN_INSPROFILE='Z:/vms/arqui/arch/gem5/outputProfile/**/stats.txt'
+    DATAPATTERN_INSPROFILE='Z:/vms/arqui/arch/gem5/outputICPonly/**/stats.txt'
     files2=glob.glob(DATAPATTERN_INSPROFILE,recursive=True)
     files2=[x.replace('\\','/') for x in files2]
     # Extract data from each file
