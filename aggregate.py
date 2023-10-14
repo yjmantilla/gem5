@@ -548,7 +548,7 @@ def plot_optimal_points_with_results_by_workload(df,variables = ['wl', 'l1is', '
     
     return results,fig
 
-    
+
 # Define circle sizes
 # Demonstrate the function with scaled data
 targets=['system.cpu.cpi', 'Energy']
@@ -563,14 +563,11 @@ def savejson(path,d):
 
 savejson(os.path.join(OUTPUTPATH,'results2D.json'),results)
 
-targets=['system.cpu.cpi', 'EDP']
-results,fig = plot_optimal_points_with_results_by_workload(df,variables=var_columns.tolist(),targets=targets,scaled=False, threshold=0.5,colors = {'h264dec': 'magenta', 'jpeg2k_enc': 'lime', 'mp3_enc': 'yellow'}, circle_sizes ={'h264dec': 120, 'jpeg2k_enc': 90, 'mp3_enc': 50})
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2deDP.pdf'))
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2deDP.png'))
+plt.close('all')
 
-savejson(os.path.join(OUTPUTPATH,'results2DeDP.json'),results)
 
-### Optimize over all workloads #########################################
+####### Optimize over threshold method, min energy, max performance(min cpi) or min edp (4 points) #############################
+
 
 wl_variable = 'workload'
 targets=['system.cpu.cpi', 'Energy']
@@ -584,26 +581,68 @@ mean_df = dfnorm.groupby(var_columns.tolist()[1:])[targets].mean().reset_index()
 # Add a column for the 'mean workload'
 mean_df[wl_variable] = 'mean_workload'
 
+df=mean_df.copy()
 
-results,fig = plot_optimal_points_with_results_by_workload(mean_df,variables=var_columns.tolist(),targets=targets,scaled=True, threshold=0.5,colors = {'mean_workload': 'magenta'}, circle_sizes = {'mean_workload':120},figsize=(6, 6),already_scaled=True)
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2dmean.pdf'))
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2dmean.png'))
-savejson(os.path.join(OUTPUTPATH,'results2Dmean.json'),results)
+# Compute the distance to the origin
+df['distance_to_origin'] = np.sqrt(sum(df[col]**2 for col in targets))
 
-wl_variable = 'workload'
-targets=['system.cpu.cpi', 'EDP']
-dfnorm=df.copy()
-for col in targets:
-    dfnorm[col] = df.groupby(wl_variable)[col].transform(lambda x: (x - x.min()) / (x.max() - x.min()))
+def find_constrained_best_point(subset, columns_list=targets, threshold=0.5):
+    # Check if the subset is a grouped object (Series) and convert to DataFrame if necessary
+    if isinstance(subset, pd.Series):
+        subset = subset.to_frame().T
 
-# Group by the variables except 'wl' and compute the mean for 'Energy' and 'system.cpu.cpi'
-mean_df = dfnorm.groupby(var_columns.tolist()[1:])[targets].mean().reset_index()
+    # Filter points where both dimensions are below the threshold
+    filtered_points = subset[subset[columns_list].apply(lambda row: all(val <= threshold for val in row), axis=1)]
+    
+    # Return the point closest to the origin from the filtered set, or from the entire set if no points are found.
+    if not filtered_points.empty:
+        return filtered_points.nsmallest(1, 'distance_to_origin')
+    else:
+        return subset.nsmallest(1, 'distance_to_origin')
 
-# Add a column for the 'mean workload'
-mean_df[wl_variable] = 'mean_workload'
+
+# Using threshold
+best_points_constrained = find_constrained_best_point(df)
+best_points_constrained.index[0]
+
+# Using min EDP
+df['EDP']=df['Energy']*(df['system.cpu.cpi']**2)
+minEdp=df[df['EDP'] == df['EDP'].min()].index[0]
+
+# Using min CPI
+minCpi=df[df['system.cpu.cpi'] == df['system.cpu.cpi'].min()].index[0]
+
+# Using min Energy
+minEnergy=df[df['Energy'] == df['Energy'].min()].index[0]
 
 
-results,fig = plot_optimal_points_with_results_by_workload(mean_df,variables=var_columns.tolist(),targets=targets,scaled=True, threshold=0.5,colors = {'mean_workload': 'magenta'}, circle_sizes = {'mean_workload':120},figsize=(6, 6),already_scaled=True)
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2dmeaneDP.pdf'))
-fig.savefig(os.path.join(OUTPUTPATH,f'perf_2dmeaneDP.png'))
-savejson(os.path.join(OUTPUTPATH,'results2DmeaneDP.json'),results)
+# Assume these are the rows of interest, determined using some other columns
+rows_of_interest = [best_points_constrained.index[0], minEdp, minCpi, minEnergy]
+colors_of_interest = ['red', 'blue', 'green', 'magenta']
+sizes_of_interest = [120, 120, 300, 120]
+labels=['Threshold Method','Min EDP','Min CPI','Min Energy']
+fig=plt.figure(figsize=(12, 7.5))
+# Plotting all points
+plt.scatter(df[targets[0]], df[targets[1]], color='gray', label='All points')
+
+# Highlighting points of interest
+for idx, row_idx in enumerate(rows_of_interest):
+    #plt.scatter(df.iloc[row_idx][targets[0]], df.iloc[row_idx][targets[1]], color=colors_of_interest[idx], s=200, label=f'Point {idx}', edgecolors='black', linewidth=1.5)
+    #facecolors='none', edgecolors=colors[best_row[wl_variable]], linewidth=1.5, marker='o'
+    plt.scatter(df.iloc[row_idx][targets[0]], df.iloc[row_idx][targets[1]], facecolors='none', s=sizes_of_interest[idx], edgecolors=colors_of_interest[idx], marker='o',linewidth=1.5, label=labels[idx])
+plt.xlabel(targets[0])
+plt.ylabel(targets[1])
+plt.legend()
+fig.savefig(os.path.join(OUTPUTPATH,f'perf_4points.pdf'))
+plt.close('all')
+
+
+optimdf=df.iloc[rows_of_interest]
+
+optimdf['method']=labels
+
+optimdf.to_csv(os.path.join(OUTPUTPATH,'optim.csv'),sep=',')
+
+transposed_df = optimdf.transpose()
+
+transposed_df.to_csv(os.path.join(OUTPUTPATH,'transposed.csv'),sep=',')
