@@ -1,0 +1,44 @@
+{
+    "h264dec": {
+        "Energy": 1.266162,
+        "Scaled Energy": 0.12008655812654329,
+        "system.cpu.cpi": 0.898042,
+        "Scaled system.cpu.cpi": 0.03199858121888533,
+        "Combination": {
+            "l1i_size": "128kB",
+            "l2_lat": 6,
+            "l3_size": "1MB",
+            "issue_width": 4,
+            "rob_entries": 64,
+            "num_fu_intALU": 4
+        }
+    },
+    "jpeg2k_enc": {
+        "Energy": 1.490907,
+        "Scaled Energy": 0.47826151121605665,
+        "system.cpu.cpi": 1.10896,
+        "Scaled system.cpu.cpi": 0.0554330469165828,
+        "Combination": {
+            "l1i_size": "32kB",
+            "l2_lat": 6,
+            "l3_size": "4MB",
+            "issue_width": 4,
+            "rob_entries": 64,
+            "num_fu_intALU": 2
+        }
+    },
+    "mp3_enc": {
+        "Energy": 1.098106,
+        "Scaled Energy": 0.037877705400293935,
+        "system.cpu.cpi": 1.19907,
+        "Scaled system.cpu.cpi": 0.10745233968805135,
+        "Combination": {
+            "l1i_size": "128kB",
+            "l2_lat": 6,
+            "l3_size": "1MB",
+            "issue_width": 4,
+            "rob_entries": 64,
+            "num_fu_intALU": 2
+        }
+    }
+}
